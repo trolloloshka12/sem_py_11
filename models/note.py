@@ -1,13 +1,13 @@
 import json
-from datetime import datetime
 import csv
+from datetime import datetime
 
 class Note:
     def __init__(self, id, title, content, timestamp=None):
         self.id = id
         self.title = title
         self.content = content
-        self.timestamp = timestamp or datetime.now().strftime('%d-%m-%Y %H:%M:%S')
+        self.timestamp = timestamp or datetime.now().strftime("%d-%m-%Y %H:%M:%S")
 
     def to_dict(self):
         return {
@@ -41,24 +41,27 @@ class Note:
 
     @staticmethod
     def export_to_csv(notes, file_path="data/notes.csv"):
-        with open(file_path, mode='w', newline='', encoding='utf-8') as file:
+        with open(file_path, mode="w", encoding="utf-8") as file:
             writer = csv.writer(file)
-            writer.writerow(['ID', 'Title', 'Content', 'Timestamp'])
+            writer.writerow(["ID", "Title", "Content", "Timestamp"])
             for note in notes:
                 writer.writerow([note.id, note.title, note.content, note.timestamp])
-        print(f"Заметки экспортированы в файл {file_path}")
+        print(f"Заметки экспортированы в {file_path}")
 
     @staticmethod
     def import_from_csv(file_path="data/notes.csv"):
         try:
-            with open(file_path, mode='r', newline='', encoding='utf-8') as file:
+            with open(file_path, mode="r", encoding="utf-8") as file:
                 reader = csv.DictReader(file)
-                return [Note(
-                    id=int(row['ID']),
-                    title=row['Title'],
-                    content=row['Content'],
-                    timestamp=row['Timestamp']
-                ) for row in reader]
+                return [
+                    Note(
+                        id=int(row["ID"]),
+                        title=row["Title"],
+                        content=row["Content"],
+                        timestamp=row["Timestamp"],
+                    )
+                    for row in reader
+                ]
         except FileNotFoundError:
             print("Файл для импорта не найден.")
             return []

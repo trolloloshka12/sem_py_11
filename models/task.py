@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+import csv
 
 class Task:
     def __init__(self, id, title, description, done=False, priority="Средний", due_date=None):
@@ -8,7 +8,7 @@ class Task:
         self.description = description
         self.done = done
         self.priority = priority
-        self.due_date = due_date or datetime.now().strftime('%d-%m-%Y')
+        self.due_date = due_date
 
     def to_dict(self):
         return {
@@ -43,3 +43,32 @@ class Task:
     def save_tasks(tasks, file_path="data/tasks.json"):
         with open(file_path, "w") as file:
             json.dump([task.to_dict() for task in tasks], file, ensure_ascii=False, indent=4)
+
+    @staticmethod
+    def export_to_csv(tasks, file_path="data/tasks.csv"):
+        with open(file_path, mode="w", encoding="utf-8") as file:
+            writer = csv.writer(file)
+            writer.writerow(["ID", "Title", "Description", "Done", "Priority", "DueDate"])
+            for task in tasks:
+                writer.writerow([task.id, task.title, task.description, task.done, task.priority, task.due_date])
+        print(f"Задачи экспортированы в {file_path}")
+
+    @staticmethod
+    def import_from_csv(file_path="data/tasks.csv"):
+        try:
+            with open(file_path, mode="r", encoding="utf-8") as file:
+                reader = csv.DictReader(file)
+                return [
+                    Task(
+                        id=int(row["ID"]),
+                        title=row["Title"],
+                        description=row["Description"],
+                        done=row["Done"].lower() == "true",
+                        priority=row["Priority"],
+                        due_date=row["DueDate"],
+                    )
+                    for row in reader
+                ]
+        except FileNotFoundError:
+            print("Файл для импорта не найден.")
+            return []

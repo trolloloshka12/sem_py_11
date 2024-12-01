@@ -116,7 +116,9 @@ def manage_tasks():
         print("2. Создать задачу")
         print("3. Отметить задачу как выполненную")
         print("4. Фильтровать задачи")
-        print("5. Назад")
+        print("5. Экспорт задач в CSV")
+        print("6. Импорт задач из CSV")
+        print("7. Назад")
 
         choice = input("Введите номер действия: ")
         if choice == '1':
@@ -174,50 +176,17 @@ def manage_tasks():
             else:
                 print("Некорректный выбор.")
         elif choice == '5':
+            Task.export_to_csv(tasks)
+        elif choice == '6':
+            imported_tasks = Task.import_from_csv()
+            tasks.extend(imported_tasks)
+            Task.save_tasks(tasks)
+            print("Задачи успешно импортированы!")
+        elif choice == '7':
             break
         else:
             print("Некорректный выбор. Попробуйте снова.")
-
-# Управление контактами
-def manage_contacts():
-    contacts = Contact.load_contacts()
-
-    while True:
-        print("\nУправление контактами:")
-        print("1. Просмотреть все контакты")
-        print("2. Добавить новый контакт")
-        print("3. Удалить контакт")
-        print("4. Назад")
-
-        choice = input("Введите номер действия: ")
-        if choice == '1':
-            if not contacts:
-                print("Контактов пока нет.")
-            else:
-                for contact in contacts:
-                    print(f"ID: {contact.id}, Имя: {contact.name}, Телефон: {contact.phone}, Email: {contact.email}")
-        elif choice == '2':
-            name = input("Введите имя контакта: ")
-            phone = input("Введите номер телефона: ")
-            email = input("Введите адрес электронной почты: ")
-            new_contact = Contact(id=len(contacts) + 1, name=name, phone=phone, email=email)
-            contacts.append(new_contact)
-            Contact.save_contacts(contacts)
-            print("Контакт успешно добавлен!")
-        elif choice == '3':
-            try:
-                contact_id = int(input("Введите ID контакта для удаления: "))
-                contacts = [c for c in contacts if c.id != contact_id]
-                Contact.save_contacts(contacts)
-                print("Контакт успешно удалён!")
-            except ValueError:
-                print("ID должен быть числом.")
-        elif choice == '4':
-            break
-        else:
-            print("Некорректный выбор. Попробуйте снова.")
-
-# Управление финансовыми записями
+            
 def manage_finances():
     finances = FinanceRecord.load_records()
 
@@ -226,7 +195,9 @@ def manage_finances():
         print("1. Просмотреть записи")
         print("2. Добавить запись")
         print("3. Сгенерировать отчёт")
-        print("4. Назад")
+        print("4. Экспорт записей в CSV")
+        print("5. Импорт записей из CSV")
+        print("6. Назад")
 
         choice = input("Введите номер действия: ")
         if choice == '1':
@@ -236,14 +207,17 @@ def manage_finances():
                 for record in finances:
                     print(f"ID: {record.id}, Сумма: {record.amount}, Категория: {record.category}, Дата: {record.date}, Описание: {record.description}")
         elif choice == '2':
-            amount = float(input("Введите сумму (положительная — доход, отрицательная — расход): "))
-            category = input("Введите категорию: ")
-            date = input("Введите дату (ДД-ММ-ГГГГ): ")
-            description = input("Введите описание: ")
-            new_record = FinanceRecord(id=len(finances) + 1, amount=amount, category=category, date=date, description=description)
-            finances.append(new_record)
-            FinanceRecord.save_records(finances)
-            print("Запись успешно добавлена!")
+            try:
+                amount = float(input("Введите сумму (положительная — доход, отрицательная — расход): "))
+                category = input("Введите категорию: ")
+                date = input("Введите дату (ДД-ММ-ГГГГ): ")
+                description = input("Введите описание: ")
+                new_record = FinanceRecord(id=len(finances) + 1, amount=amount, category=category, date=date, description=description)
+                finances.append(new_record)
+                FinanceRecord.save_records(finances)
+                print("Запись успешно добавлена!")
+            except ValueError:
+                print("Ошибка: введите корректную сумму.")
         elif choice == '3':
             if not finances:
                 print("Записей пока нет.")
@@ -279,11 +253,17 @@ def manage_finances():
                         file.write(f"{category},{amount}\n")
                 print(f"Отчёт сохранён в файл {report_file}")
         elif choice == '4':
+            FinanceRecord.export_to_csv(finances)
+        elif choice == '5':
+            imported_records = FinanceRecord.import_from_csv()
+            finances.extend(imported_records)
+            FinanceRecord.save_records(finances)
+            print("Записи успешно импортированы!")
+        elif choice == '6':
             break
         else:
             print("Некорректный выбор. Попробуйте снова.")
 
-# Калькулятор
 def use_calculator():
     while True:
         print("\nКалькулятор:")
@@ -296,5 +276,7 @@ def use_calculator():
         except Exception as e:
             print(f"Ошибка: {e}")
 
+
 if __name__ == "__main__":
     main_menu()
+
